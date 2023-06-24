@@ -16,7 +16,7 @@ import type Config from './types/config'
 
   const streamerIds = Object.keys(renameRule)
   for (const folder of videoFolders) {
-    const streamerId = streamerIds.find((id) => folder.includes(id)) || ''
+    const streamerId = streamerIds.find((id) => folder.includes(id))
     if (!streamerId) continue
 
     const rootPath = join(folderToCheck, folder)

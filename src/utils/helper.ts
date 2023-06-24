@@ -6,7 +6,7 @@ interface WilderCardHandlerOptions {
 }
 
 export function wilderCardHandler(wildCard: string, options: WilderCardHandlerOptions) {
-  const { name, id } = options
+  const { name = 'invalid_name', id = 'invalid_id' } = options
   if (id) wildCard = wildCard.replace('{id}', id)
   if (name) wildCard = wildCard.replace('{name}', name)
   return wildCard
