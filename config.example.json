@@ -1,0 +1,16 @@
+{
+  "renameRule": {
+    "id": "name"
+  },
+  "nameWildcard": "#{id}_{name}_live_bilibili_",
+  "validExts": [
+    ".mp4",
+    ".ts",
+    ".flv"
+  ],
+  "folderToCheck": "",
+  "folderToExeFfmpeg": "",
+  "excludeFolders": [],
+  "ffmpegOptions": "-vcodec libx264 -crf 28 -preset veryfast -an",
+  "ffmpegOutPutPostFix": "_mute_convert"
+}
