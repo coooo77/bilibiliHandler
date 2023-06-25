@@ -1,5 +1,5 @@
 import { parse, join, extname } from 'path'
-import { readdirSync, renameSync, existsSync, unlinkSync } from 'fs'
+import { readdirSync, renameSync, existsSync, unlinkSync, mkdirSync } from 'fs'
 
 import config from './config.json'
 import { wilderCardHandler, spawnWithConsole } from './utils/helper'
@@ -45,6 +45,9 @@ import type Config from './types/config'
     }
   }
 
+  const processDoneFolder = join(folderToExeFfmpeg, 'done')
+  if (!existsSync(processDoneFolder)) mkdirSync(processDoneFolder, { recursive: true })
+
   for (const video of videoFilesToConvert) {
     const ext = extname(video)
     const outputFileName = video.replace(ext, `${ffmpegOutPutPostFix}.${ffmpegOutPutPostExtension}`)
@@ -52,7 +55,12 @@ import type Config from './types/config'
 
     try {
       await spawnWithConsole(command)
-      if (existsSync(outputFileName)) unlinkSync(video)
+      if (existsSync(outputFileName)) {
+        const toPath = join(processDoneFolder, parse(video).name)
+        renameSync(outputFileName, toPath)
+
+        unlinkSync(video)
+      }
     } catch (error) {
       console.error(error)
     }
