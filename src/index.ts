@@ -6,7 +6,17 @@ import { wilderCardHandler, spawnWithConsole } from './utils/helper'
 
 import type Config from './types/config'
 ;(async () => {
-  const { folderToCheck, validExts, renameRule, nameWildcard, folderToExeFfmpeg, excludeFolders, ffmpegOutPutPostFix, ffmpegOptions } = config as Config
+  const {
+    folderToCheck,
+    validExts,
+    renameRule,
+    nameWildcard,
+    folderToExeFfmpeg,
+    excludeFolders,
+    ffmpegOutPutPostFix,
+    ffmpegOptions,
+    ffmpegOutPutPostExtension,
+  } = config as Config
 
   const exeFolderName = parse(folderToExeFfmpeg)?.name
   if (exeFolderName) excludeFolders.push(exeFolderName)
@@ -37,7 +47,7 @@ import type Config from './types/config'
 
   for (const video of videoFilesToConvert) {
     const ext = extname(video)
-    const outputFileName = video.replace(ext, `${ffmpegOutPutPostFix}${ext}`)
+    const outputFileName = video.replace(ext, `${ffmpegOutPutPostFix}.${ffmpegOutPutPostExtension}`)
     const command = `ffmpeg -i ${video} ${ffmpegOptions} ${outputFileName}`
 
     try {

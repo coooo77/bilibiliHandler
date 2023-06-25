@@ -10,5 +10,6 @@ export default interface Config {
   excludeFolders: string[]
   validExts: string[]
   ffmpegOutPutPostFix: string
+  ffmpegOutPutPostExtension: string
   ffmpegOptions: string
 }
