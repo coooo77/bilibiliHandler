@@ -56,7 +56,7 @@ import type Config from './types/config'
     try {
       await spawnWithConsole(command)
       if (existsSync(outputFileName)) {
-        const toPath = join(processDoneFolder, parse(video).name)
+        const toPath = join(processDoneFolder, parse(video).base)
         renameSync(outputFileName, toPath)
 
         unlinkSync(video)
