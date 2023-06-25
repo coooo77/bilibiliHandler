@@ -8,8 +8,9 @@ import type Config from './types/config'
 ;(async () => {
   const { folderToCheck, validExts, renameRule, nameWildcard, folderToExeFfmpeg, excludeFolders, ffmpegOutPutPostFix, ffmpegOptions } = config as Config
 
+  const exceptionFolders = excludeFolders.concat(folderToExeFfmpeg)
   const videoFolders = readdirSync(folderToCheck, { withFileTypes: true })
-    .filter((dirent) => dirent.isDirectory() && !excludeFolders.includes(dirent.name))
+    .filter((dirent) => dirent.isDirectory() && !exceptionFolders.includes(dirent.name))
     .map(({ name }) => name)
 
   const videoFilesToConvert = [] as string[]
