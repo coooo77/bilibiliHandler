@@ -1,4 +1,4 @@
-import { join, extname } from 'path'
+import { parse, join, extname } from 'path'
 import { readdirSync, renameSync, existsSync, unlinkSync } from 'fs'
 
 import config from './config.json'
@@ -8,9 +8,11 @@ import type Config from './types/config'
 ;(async () => {
   const { folderToCheck, validExts, renameRule, nameWildcard, folderToExeFfmpeg, excludeFolders, ffmpegOutPutPostFix, ffmpegOptions } = config as Config
 
-  const exceptionFolders = excludeFolders.concat(folderToExeFfmpeg)
+  const exeFolderName = parse(folderToExeFfmpeg)?.name
+  if (exeFolderName) excludeFolders.push(exeFolderName)
+
   const videoFolders = readdirSync(folderToCheck, { withFileTypes: true })
-    .filter((dirent) => dirent.isDirectory() && !exceptionFolders.includes(dirent.name))
+    .filter((dirent) => dirent.isDirectory() && !excludeFolders.includes(dirent.name))
     .map(({ name }) => name)
 
   const videoFilesToConvert = [] as string[]
