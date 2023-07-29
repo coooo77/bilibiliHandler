@@ -31,6 +31,7 @@ async function mainProcess() {
     if (!streamerId) continue
 
     const rootPath = join(folderToCheck, folder)
+    console.log(`check folder path:${rootPath}`)
     const videoFiles = readdirSync(rootPath).filter((filename) => validExts.includes(extname(filename)))
 
     const wildCard = wilderCardHandler(nameWildcard, { id: streamerId, name: renameRule[streamerId] })
@@ -56,4 +57,4 @@ function intervalFn() {
   }, 60 * 1000 * exeIntervalInMinutes)
 }
 
-intervalFn()
+mainProcess().then(intervalFn)

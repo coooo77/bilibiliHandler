@@ -1,5 +1,5 @@
 import { parse } from 'path'
-import { copyFileSync, unlinkSync, renameSync } from 'fs'
+import fs, { copyFileSync, unlinkSync, renameSync } from 'fs'
 
 interface WilderCardHandlerOptions {
   name?: string
@@ -42,7 +42,7 @@ export async function moveFile(fromPath: string, toPath: string) {
   const from = parse(fromPath)
   const isSameRoot = from.root === to.root
 
-  const moveFn = isSameRoot ? renameSync : moveFileCrossDevice
+  const moveFn = isSameRoot ? renameSync.bind(fs, fromPath, toPath) : moveFileCrossDevice.bind(null, fromPath, toPath)
 
   try {
     await reTry(moveFn)
