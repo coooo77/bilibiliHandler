@@ -9,7 +9,5 @@ export default interface Config {
   folderToExeFfmpeg: string
   excludeFolders: string[]
   validExts: string[]
-  ffmpegOutPutPostFix: string
-  ffmpegOutPutPostExtension: string
-  ffmpegOptions: string
+  exeIntervalInMinutes: number
 }

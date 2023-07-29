@@ -1,28 +1,26 @@
 import { parse, join, extname } from 'path'
-import { readdirSync, renameSync, existsSync, unlinkSync, mkdirSync } from 'fs'
+import { readdirSync } from 'fs'
 
 import config from './config.json'
-import { wilderCardHandler, spawnWithConsole } from './utils/helper'
+import { wilderCardHandler, moveFile } from './utils/helper'
 
 import type Config from './types/config'
-;(async () => {
-  const {
-    folderToCheck,
-    validExts,
-    renameRule,
-    nameWildcard,
-    folderToExeFfmpeg,
-    excludeFolders,
-    ffmpegOutPutPostFix,
-    ffmpegOptions,
-    ffmpegOutPutPostExtension,
-  } = config as Config
 
+const { folderToCheck, validExts, renameRule, nameWildcard, folderToExeFfmpeg, excludeFolders, exeIntervalInMinutes } = config as Config
+
+Object.entries(config).forEach(([key, value]) => {
+  if (value === undefined) throw Error(`Fail to find key ${key} in config.json`)
+})
+
+async function mainProcess() {
   const exeFolderName = parse(folderToExeFfmpeg)?.name
-  if (exeFolderName) excludeFolders.push(exeFolderName)
+  const excludeList = [...excludeFolders]
+  if (exeFolderName) excludeList.push(exeFolderName)
+
+  console.log(`check folder path: ${folderToCheck}`)
 
   const videoFolders = readdirSync(folderToCheck, { withFileTypes: true })
-    .filter((dirent) => dirent.isDirectory() && !excludeFolders.includes(dirent.name))
+    .filter((dirent) => dirent.isDirectory() && !excludeList.includes(dirent.name))
     .map(({ name }) => name)
 
   const videoFilesToConvert = [] as string[]
@@ -39,30 +37,23 @@ import type Config from './types/config'
     for (const videoFile of videoFiles) {
       const fromPath = join(rootPath, videoFile)
       const toPath = join(folderToExeFfmpeg, wildCard + videoFile)
-      renameSync(fromPath, toPath)
+      try {
+        await moveFile(fromPath, toPath)
 
-      videoFilesToConvert.push(toPath)
-    }
-  }
-
-  const processDoneFolder = join(folderToExeFfmpeg, 'done')
-  if (!existsSync(processDoneFolder)) mkdirSync(processDoneFolder, { recursive: true })
-
-  for (const video of videoFilesToConvert) {
-    const ext = extname(video)
-    const outputFileName = video.replace(ext, `${ffmpegOutPutPostFix}.${ffmpegOutPutPostExtension}`)
-    const command = `ffmpeg -i ${video} ${ffmpegOptions} ${outputFileName}`
-
-    try {
-      await spawnWithConsole(command)
-      if (existsSync(outputFileName)) {
-        const toPath = join(processDoneFolder, parse(outputFileName).base)
-        renameSync(outputFileName, toPath)
-
-        unlinkSync(video)
+        videoFilesToConvert.push(toPath)
+      } catch (error) {
+        console.error(error)
       }
-    } catch (error) {
-      console.error(error)
     }
   }
-})()
+}
+
+function intervalFn() {
+  setTimeout(async () => {
+    await mainProcess()
+
+    intervalFn()
+  }, 60 * 1000 * exeIntervalInMinutes)
+}
+
+intervalFn()

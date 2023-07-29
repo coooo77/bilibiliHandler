@@ -11,7 +11,5 @@
   "folderToCheck": "",
   "folderToExeFfmpeg": "",
   "excludeFolders": [],
-  "ffmpegOptions": "-vcodec libx264 -crf 28 -preset veryfast -an",
-  "ffmpegOutPutPostFix": "_mute_convert",
-  "ffmpegOutPutPostExtension": "mp4"
+  "exeIntervalInMinutes": 60
 }

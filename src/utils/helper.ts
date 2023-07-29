@@ -1,4 +1,5 @@
-import { spawn } from 'child_process'
+import { parse } from 'path'
+import { copyFileSync, unlinkSync, renameSync } from 'fs'
 
 interface WilderCardHandlerOptions {
   name?: string
@@ -12,16 +13,40 @@ export function wilderCardHandler(wildCard: string, options: WilderCardHandlerOp
   return wildCard
 }
 
-export async function spawnWithConsole(command: string) {
-  return new Promise((res, rej) => {
-    try {
-      const task = spawn(command, [], { shell: true })
+export function wait(seconds: number) {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000))
+}
 
-      task.stderr.on('data', (data) => console.log('stderr', data.toString()))
-      task.on('close', res)
-    } catch (error) {
-      console.error(error)
-      rej()
-    }
-  })
+export async function reTry(fn: Function, maxRetries = 3, intervalInSec = 0.5) {
+  try {
+    await fn()
+  } catch (error: any) {
+    if (maxRetries <= 0) throw new Error(error?.message)
+
+    await wait(intervalInSec)
+
+    await reTry(fn, --maxRetries)
+  }
+}
+
+export function moveFileCrossDevice(fromPath: string, toPath: string) {
+  copyFileSync(fromPath, toPath)
+
+  unlinkSync(fromPath)
+}
+
+export async function moveFile(fromPath: string, toPath: string) {
+  console.log(`move file ${fromPath} to ${toPath}...`)
+
+  const to = parse(toPath)
+  const from = parse(fromPath)
+  const isSameRoot = from.root === to.root
+
+  const moveFn = isSameRoot ? renameSync : moveFileCrossDevice
+
+  try {
+    await reTry(moveFn)
+  } catch (error: any) {
+    throw new Error(`Error occurred when move file: ${fromPath}, cross device to: ${toPath}, reason: ${error?.message}`)
+  }
 }
