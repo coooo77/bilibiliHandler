@@ -1,5 +1,5 @@
 import { parse } from 'path'
-import fs, { copyFileSync, unlinkSync, renameSync } from 'fs'
+import fs, { copyFileSync, unlinkSync, renameSync, existsSync } from 'fs'
 
 interface WilderCardHandlerOptions {
   name?: string
@@ -32,11 +32,14 @@ export async function reTry(fn: Function, maxRetries = 3, intervalInSec = 0.5) {
 export function moveFileCrossDevice(fromPath: string, toPath: string) {
   copyFileSync(fromPath, toPath)
 
-  unlinkSync(fromPath)
+  if (existsSync(toPath)) {
+    console.log(`\r\ntoPath: ${toPath} exists, delete fromPath: ${fromPath}`)
+    unlinkSync(fromPath)
+  }
 }
 
 export async function moveFile(fromPath: string, toPath: string) {
-  console.log(`move file ${fromPath} to ${toPath}...`)
+  console.log(`\r\nmove file ${fromPath} to ${toPath}...`)
 
   const to = parse(toPath)
   const from = parse(fromPath)
