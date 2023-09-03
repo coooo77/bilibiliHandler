@@ -1,5 +1,6 @@
 import { parse, join, extname } from 'path'
 import { readdirSync, statSync } from 'fs'
+import { execSync } from 'child_process'
 
 import config from './config.json'
 import { wilderCardHandler, moveFile } from './utils/helper'
@@ -32,8 +33,14 @@ async function mainProcess() {
 
     const rootPath = join(folderToCheck, folder)
     console.log(`\r\ncheck folder path:${rootPath} at ${new Date().toLocaleString()}`)
-    
+
     const videoFiles = readdirSync(rootPath).filter((filename) => validExts.includes(extname(filename)))
+
+    if (videoFiles.length === 0) {
+      execSync(`recycle ${rootPath}`)
+      continue
+    }
+
     const wildCard = wilderCardHandler(nameWildcard, { id: streamerId, name: renameRule[streamerId] })
 
     for (const videoFile of videoFiles) {
