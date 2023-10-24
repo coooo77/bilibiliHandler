@@ -44,7 +44,7 @@ async function mainProcess() {
     const wildCard = wilderCardHandler(nameWildcard, { id: streamerId, name: renameRule[streamerId] })
 
     for (const videoFile of videoFiles) {
-      const toName = wildCard + videoFile.replaceAll('-', '_')
+      const toName = wildCard + videoFile
       const fromPath = join(rootPath, videoFile)
       const fileInfo = statSync(fromPath)
 
